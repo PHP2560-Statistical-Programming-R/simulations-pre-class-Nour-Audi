@@ -31,7 +31,50 @@ With this project we will simulate a famoues probability problem. This will not 
 
  1. **Gambler's Ruin**: Suppose you have a bankroll of $1000 and make bets of $100 on a fair game. By simulating the outcome directly for at most 5000 iterations of the game (or hands), estimate:
     a. the probability that you have "busted" (lost all your money) by the time you have placed your one hundredth bet. 
+```{r}
+# initial amount of money 
+pocket <- 1000
+
+gambling <- function(number.bets, bets.amount = 100) {
+  # amount of money vector that have the same size as the number of bets 
+  money <- rep(NA, number.bets)
+  #set the initial amount 
+  money[1] = pocket
+  # looping 
+  for ( i in 2:number.bets){
+    # utilization of Bernoulli distribution, either win or loss with equal probaiblity of 0.5
+    if (rbinom(1,1, 0.5) == 1) {
+      # winning and increasing the money vector by the amount of the bet 
+      money[i] <- money[i-1] + bets.amount
+    } else {
+      money[i] <- money[i-1] - bets.amount
+    } 
+    if (money[i] == 0 ) {
+      break
+    }
+  }
+    outcome<-list(bets=i,bankroll=money[i])
+return(outcome)
+}
+
+```
+
+```{r}
+bankrupt <- function(bets,func=gambling){
+num.loss<-0
+  for (i in 1:5000){
+  if (func(bets)$bets < bets) { num.loss <- num.loss+1 }
+  } 
+prob.loss<-num.loss/5000
+prob.loss
+}
+
+```
     b. the probability that you have busted by the time you have placed your five hundredth bet by simulating the outcome directly. 
+```{r}
+bankrupt(500)
+
+```
     c. the mean time you go bust, given that you go bust within the first 5000 hands.
     d. the mean and variance of your bankroll after 100 hands (including busts).
     e. the mean and variance of your bankroll after 500 hands (including busts).
